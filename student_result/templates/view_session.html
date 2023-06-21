@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+{{ year }} </br>
+{{ name }} </br>
+    <table>
+    {% for course in courses %}
+        <tr>
+            <td>{{ course.code }}</td>
+            <td>{{ course.title }}</td>
+            <td>{{ course.credit }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+{% endblock content %}
