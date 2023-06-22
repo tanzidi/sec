@@ -1,8 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from django.core.serializers import serialize
-from .models import Session
+from .models import Session, Exam, Semester, Student, Result
 import pandas as pd
 import json
 
@@ -82,7 +81,9 @@ def gen (df, reg, credit_list, title_list):
     sem_full = []
     sem_final = {}
     idx = df.columns
-    df1 = df.loc[df[idx[1]] == reg]
+    df1 = df.loc[df[idx[1]] == int(reg)]
+    if (df1.empty):
+        return "nothing"
     name = df1[idx[2]].values[0]
 
     # 1st semester
@@ -137,3 +138,39 @@ def gen (df, reg, credit_list, title_list):
     ret['name'] = name
     return ret
 
+def add_result(reqeust, session, semester):
+    session_data = Session.objects.get(year=session)
+    session_id = session_data.id
+    semester_id = semester
+    exam = Exam.objects.get(session=session_id, semester=semester_id)
+    exam_id = exam.id
+    
+    courses = json.loads(session_data.courses)
+    title_list = {}
+    credit_list = {}
+    for course in courses:
+        title_list[course['code']] = course['title']
+        credit_list[course['code']] = course['credit']
+    
+    if reqeust.method == 'POST':
+        file = reqeust.FILES['upload_file']
+        df = pd.read_excel(file)
+        cols = df.columns
+        regis = list(df[cols[1]])
+        for i in regis:
+            ret = gen(df=df, reg=i, credit_list=credit_list, title_list=title_list)
+            try:
+                student = Student.objects.get(regi=i)
+                result = Result()
+                result.student = student
+                result.exam = exam
+                ret['held'] = exam.held
+                result.result = ret
+                result.save()
+            except:
+                pass
+    return render(reqeust, 'add_result.html', {"session_id" : session_data, "semester_id" : semester_id, "student" : student})
+
+
+def student(request):
+    return render(request, 'student.html', {})
