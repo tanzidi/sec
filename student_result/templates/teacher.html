@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    
+    <h2>Batchwise Result</h2>
+    <div style="width: 35em;">
+        <form method='POST' action="">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="session">Select Session</label>
+                <select class="form-control" id="session" name="session">
+                    {% for session in sessions %}
+                        <option value="{{ session.year }}">{{ session }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Find</button>
+        </form>
+    </div>
+    {% if status == 1 %}
+        <div style="margin-top: 1em;">
+            <h5>{{ session }} Session : Select Semester</h5>
+            <ul>
+            {% for semester in semesters %}
+                <li><a href="{% url 'add_result' session semester.id %}">{{ semester.name }}</a></li>
+            {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+{% endblock content %}

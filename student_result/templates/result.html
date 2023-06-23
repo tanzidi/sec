@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 style="text-align: center; margin-bottom: .5em;">Sylhet Engineering College</h1>
+
+<div style="margin-bottom:.2em; display: grid; align-items: center; justify-content: center;">
+<h4 style="padding: .2em 1em; width: 100%; border: 2px solid gray; border-radius: .2em; display: grid; align-items: center; justify-content: center;">Academic Result</h4>
+</div>
+<div style="margin-bottom:2em; margin-top: 2em; display: grid; grid-template-columns: 1fr 1fr;">
+    <div style="display: grid; align-items: center; justify-content: center;">
+        <div style="line-height: 2em; margin-left: 1em;">
+            <strong>Name : </strong> <span>{{ student.name }}</span> </br>
+            <strong>Regi : </strong> <span>{{ student.regi }}</span> </br>
+            <strong>Session : </strong> <span>{{ student.session.year }}</span> </br>
+            <strong>Semester : </strong> <span>{{ semester.name }}</span>
+        </div>
+    </div>
+    
+    <div style="display: grid;  font-size:.7em; width: 80%; align-items: center; justify-content: center;">
+        <div style="padding:.5em; border: 1px solid black; display: grid; grid-template-columns: 2fr 1fr 1fr;">
+            <span style="border-bottom: 1px solid black;">Numeric Grade</span><span style="border-bottom: 1px solid black;">Letter Grade</span><span style="border-bottom: 1px solid black;">Grade Point</span>
+            <span>80% or above</span><span>A+</span><span>4.00</span>
+            <span>75% to less than 80%</span><span>A</span><span>3.75</span>
+            <span>70% to less than 75%</span><span>A-</span><span>3.50</span>
+            <span>65% to less than 70%</span><span>B+</span><span>3.25</span>
+            <span>60% to less than 65%</span><span>B</span><span>3.00</span>
+            <span>55% to less than 60%</span><span>B-</span><span>2.75</span>
+            <span>50% to less than 55%</span><span>C+</span><span>2.50</span>
+            <span>45% to less than 50%</span><span>C</span><span>2.25</span>
+            <span>40% to less than 45%</span><span>C-</span><span>2.00</span>
+            <span>less than 40%</span><span>F</span><span>0.00</span>
+        </div>
+    </div>
+</div>
+<div style="display: grid; grid-template-columns: 1fr 1fr;">
+    <h6>{{ semester.name }} {{ student.session.year }}</h6>
+    <h6 style="text-align: right;">Held on: {{ held }}</h6>
+</div>
+<table class="table table-bordered">
+    <thead>
+      <tr>
+        <th scope="col">Course No.</th>
+        <th scope="col">Course Title</th>
+        <th scope="col">Credit</th>
+        <th scope="col">Grade Point</th>
+        <th scope="col">Letter Grade</th>
+      </tr>
+    </thead>
+    <tbody>
+        
+      {% for i in sem_full %}
+        <tr>                
+            <td>{{ i.code }}</td>
+            <td>{{ i.title }}</td>
+            <td>{{ i.cr }}</td>
+            <td>{{ i.gp }}</td>
+            <td>{{ i.lg }}</td>
+        </tr>
+      {% endfor %}
+      <tr>
+        <td colspan="2" style="text-align: right;">This Semester Total :</td>
+        <td>{{ sem_final.cr_cur }}</td>
+        <td>{{ sem_final.gp_cur }}</td>
+        <td>{{ sem_final.lg_cur }}</td>
+      </tr>
+      <tr>
+        <td colspan="2" style="text-align: right;">Cumulative :</td>
+        <td>{{ sem_final.cr_com }}</td>
+        <td>{{ sem_final.gp_com }}</td>
+        <td>{{ sem_final.lg_com }}</td>
+      </tr>
+    </tbody>
+  </table> 
+{% endblock content %}

@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 style="text-align: center; margin-bottom: .5em;">Sylhet Engineering College</h1>
+
+<div style="margin-bottom:.2em; display: grid; align-items: center; justify-content: center;">
+<h4 style="padding: .2em 1em; width: 100%; border: 2px solid gray; border-radius: .2em; display: grid; align-items: center; justify-content: center;">Academic Result</h4>
+</div>
+<div style="margin-bottom:2em; margin-top: 2em; display: grid; grid-template-columns: 1fr 1fr;">
+    <div style="display: grid; align-items: center; justify-content: center;">
+        <div style="line-height: 2em; margin-left: 1em;">
+            <strong>Name : </strong> <span>{{ student.name }}</span> </br>
+            <strong>Regi : </strong> <span>{{ student.regi }}</span> </br>
+            <strong>Session : </strong> <span>{{ student.session.year }}</span> </br>
+            <strong>Semester : </strong> <span>{{ semester }}</span>
+        </div>
+    </div>
+    <div style="display: grid; align-items: center; justify-content: center;">
+        <form method='POST' action="{% url 'delete_result' %}">
+            {% csrf_token %}
+            <input type="text" name="result_id" value="{{ result_id }}" hidden>
+            <button type="submit" class="btn btn-danger">Delete Result</button>
+        </form>
+    </div>
+</div>
+
+<table class="table table-bordered">
+    <thead>
+      <tr>
+        <th scope="col">Course No.</th>
+        <th scope="col">Course Title</th>
+        <th scope="col">Credit</th>
+        <th scope="col">Grade Point</th>
+        <th scope="col">Letter Grade</th>
+      </tr>
+    </thead>
+    <tbody>
+        
+      {% for i in sem_full %}
+        <tr>                
+            <td>{{ i.code }}</td>
+            <td>{{ i.title }}</td>
+            <td>{{ i.cr }}</td>
+            <td>{{ i.gp }}</td>
+            <td>{{ i.lg }}</td>
+        </tr>
+      {% endfor %}
+      <tr>
+        <td colspan="2" style="text-align: right;">This Semester Total :</td>
+        <td>{{ sem_final.cr_cur }}</td>
+        <td>{{ sem_final.gp_cur }}</td>
+        <td>{{ sem_final.lg_cur }}</td>
+      </tr>
+      <tr>
+        <td colspan="2" style="text-align: right;">Cumulative :</td>
+        <td>{{ sem_final.cr_com }}</td>
+        <td>{{ sem_final.gp_com }}</td>
+        <td>{{ sem_final.lg_com }}</td>
+      </tr>
+    </tbody>
+  </table> 
+{% endblock content %}

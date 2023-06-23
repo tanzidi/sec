@@ -16,7 +16,7 @@ class Student(models.Model):
     name = models.CharField(max_length=100)
     email = models.CharField(max_length=100)
     phone = models.CharField(max_length=20)
-    address = models.CharField(max_length=100)
+    address = models.TextField()
     hall = models.BooleanField(default=False)
     session = models.ForeignKey(Session, null=True, on_delete=models.CASCADE) 
     # on_delete=models.CASCADE means when a reference is detelted it will delete the related data also

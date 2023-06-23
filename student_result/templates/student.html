@@ -1,7 +1,106 @@
 {% extends 'base.html' %}
 
 {% block content %}
+{% if status == 1 %}
+<div class="row">
+    <div class="col-sm-6">
+      <div class="card">
+        <div class="card-body">
+            <h2 class="card-title">Student Information</h2>
+            <p class="card-text">
+              <strong>Name: </strong> {{ student.name }} </br>
+              <strong>Regi: </strong> {{ student.regi }} </br>
+              <strong>Email: </strong> {{ student.email }} </br>
+              <strong>Phone: </strong> {{ student.phone }} </br>
+              <strong>Address: </strong> {{ student.address }} </br>
+              <strong>Session: </strong> {{ student.session.year }} </br>
+            </p>
+          <!-- <a href="#" class="btn btn-primary">Go somewhere</a> -->
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <div class="card">
+        <div class="card-body">
+          <h2 class="card-title">Result Query</h2>
+          <p class="card-text">
+                <ul>
+                {% for semester in semesters %}
+                    <li><a href="{% url 'result' student.session.year semester.id %}">{{ semester.name }}</a></li>
+                {% endfor %}
+                </ul>
+            </p>
+          <!-- <a href="#" class="btn btn-primary">Go somewhere</a> -->
+        </div>
+      </div>
+    </div>
+</div>
 
-<h1>Student Page</h1>
-
+{% else %}
+    <h2>Student Information Update</h2>
+    <div style="width: 35em;">
+        <form method="POST" action="">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="regi">Registration No.</label>
+                <input type="text" name="regi" class="form-control" id="regi" placeholder="Regi">
+            </div>
+            <!-- <input type="text" name="regi" placeholder="Regi"/> </br> -->
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" name="name" class="form-control" id="name" aria-describedby="nameHelp" placeholder="Name">
+                <small id="nameHelp" class="form-text text-muted">Provide the name as certificate</small>
+            </div>
+            <!-- <input type="text" name="name" placeholder="Name"/> </br> -->
+            <div class="form-group">
+                <label for="Email">Email</label>
+                <input type="text" name="email" class="form-control" id="email" placeholder="Email">
+            </div>
+            <!-- <input type="email" name="email" placeholder="Email"/> </br> -->
+            <div class="form-group">
+                <label for="phone">Phone No.</label>
+                <input type="text" name="phone" class="form-control" id="phone" placeholder="Phone">
+            </div>
+            <!-- <input type="text" name="phone" placeholder="Phone"/> </br> -->
+            <div class="form-group">
+                <label for="address">Address</label>
+                <textarea class="form-control" name="address" id="address" rows="3"></textarea>
+            </div>
+            <!-- <textarea name="address">Enter Address</textarea> </br> -->
+            <div class="form-group">
+                <label for="hall">Hall Residence</label>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="hall" id="no" value="0" checked>
+                    <label class="form-check-label" for="no">No</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="hall" id="yes" value="1">
+                    <label class="form-check-label" for="yes">Yes</label>
+                </div>
+            </div>
+            <!-- <span>Hall Residence : </span>
+            <input type="radio" id="no" name="hall" value="0" checked>
+            <label for="no">No</label>
+            <input type="radio" id="yes" name="hall" value="1">
+            <label for="yes">Yes</label> </br> -->
+            <div class="form-group">
+                <label for="session">Select Session</label>
+                <select class="form-control" id="session" name="session">
+                    {% for session in sessions %}
+                        <option value="{{ session.id }}">{{ session.year }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <!-- <span>session : </span>
+            <select name="session" id="session">
+                {% for session in sessions %}
+                    <option value="{{ session.id }}">{{ session.year }}</option>
+                {% endfor %}
+            </select> </br> -->
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <!-- <input type="submit" name="submit" value="Submit"/> -->
+        </form>
+    </div>
+{% endif %}
 {% endblock content %}
