@@ -1,13 +1,45 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<h3>Add New Session</h3>
+<div style="display: grid; grid-template-columns: 1fr 1fr;">
+    <div style="width: 30em;">
+        <form method = "POST" action="" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="year">Session Year</label>
+                <input type="text" name="year" class="form-control" id="year" placeholder="Ex. 2018-19">
+            </div>
+            <div class="form-group">
+                <label for="name">Batch Name</label>
+                <input type="text" name="name" class="form-control" id="name" placeholder="Ex. Ovikkhep">
+            </div>
+            <div class="mb-3">
+                <label for="upload_file" class="form-label">Course Details (.xls)</label>
+                <input class="form-control" type="file" id="upload_file" name="upload_file">
+            </div>
+            <!-- <input type="file" name="upload_file"/> -->
+            <button type="submit" name="submit" class="btn btn-primary">Submit</button>
+            <!-- <input type="submit" name="submit" value="Submit"/> -->
+        </form>
+    </div>
+    <div>
+        <h5>Sessions:</h5>
+        <ul>
+            {% for session in sessions %}
+                <li><a href="{% url 'view_session' session.year %}">{{ session.year }} ({{ session.name }})</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
 
+<!-- 
 <form method = "POST" action = "" enctype="multipart/form-data">
     {% csrf_token %}
     <span>Year:</span><input type = "text" name = "year"/> </br> </br>
     <span>Name:</span><input type = "text" name = "name"/> </br> </br>
     <input type = "file" name = "upload_file"/> </br> </br>
     <input type = "submit" name = "submit" value = "Submit"/>
-</form>
+</form> -->
 
 {% endblock content %}

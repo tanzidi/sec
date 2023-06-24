@@ -1,14 +1,63 @@
 {% extends 'base.html' %}
 {% block content %}
-{{ year }} </br>
-{{ name }} </br>
-    <table>
-    {% for course in courses %}
-        <tr>
-            <td>{{ course.code }}</td>
-            <td>{{ course.title }}</td>
-            <td>{{ course.credit }}</td>
-        </tr>
-    {% endfor %}
-    </table>
+<h3>Session : {{ year }} ({{ name }})</h3>
+<div style="display: grid; grid-template-columns: 1fr 1fr;">
+    <div style="margin-right: 2em">
+        <h5>Student List:</h5>
+        <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Regi</th>
+                <th scope="col">Phone</th>
+              </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                    <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td>{{ student.name }}</td>
+                        <td>{{ student.regi }}</td>
+                        <td>{{ student.phone }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+          </table>
+    </div>
+    <div>
+        <h5>Course List:</h5>
+        <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Code</th>
+                <th scope="col">Title</th>
+                <th scope="col">Credit</th>
+              </tr>
+            </thead>
+            <tbody>
+                {% for course in courses %}
+                    <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td>{{ course.code }}</td>
+                        <td>{{ course.title }}</td>
+                        <td>{{ course.credit }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+          </table>
+        <!-- <table style="border: .5px solid gray;">
+            {% for course in courses %}
+                <tr>
+                    <td>{{ course.code }}</td>
+                    <td>{{ course.title }}</td>
+                    <td>{{ course.credit }}</td>
+                </tr>
+            {% endfor %}
+        </table> -->
+    </div>
+
+</div>
+    
 {% endblock content %}

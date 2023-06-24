@@ -8,19 +8,47 @@
 <div style="margin-bottom:2em; margin-top: 2em; display: grid; grid-template-columns: 1fr 1fr;">
     <div style="display: grid; align-items: center; justify-content: center;">
         <div style="line-height: 2em; margin-left: 1em;">
-            <strong>Name : </strong> <span>{{ student.name }}</span> </br>
-            <strong>Regi : </strong> <span>{{ student.regi }}</span> </br>
-            <strong>Session : </strong> <span>{{ student.session.year }}</span> </br>
+            <strong>Name : </strong> 
+            <span>{% if student.name %}{{ student.name }}{% else %}Not Registered{% endif %}</span> </br>
+            <strong>Regi : </strong> <span>{{ regi }}</span> </br>
+            <strong>Session : </strong> <span>{% if student.session.year %}{{ student.session.year }}{% else %}Not Registered{% endif %}</span> </br>
             <strong>Semester : </strong> <span>{{ semester }}</span>
         </div>
     </div>
     <div style="display: grid; align-items: center; justify-content: center;">
-        <form method='POST' action="{% url 'delete_result' %}">
+        <form id="delete_form" method='POST' action="{% url 'delete_result' %}">
             {% csrf_token %}
             <input type="text" name="result_id" value="{{ result_id }}" hidden>
+            <input type="text" name="next" value="/{{ student.session.year }}/{{ semester_id}}/" hidden>
             <button type="submit" class="btn btn-danger">Delete Result</button>
         </form>
     </div>
+    <script>
+      document.getElementById('delete_form').addEventListener('submit', function(e) {
+          let form = this
+          console.log(form)
+          console.log('hi')
+          e.preventDefault();
+          Swal.fire({
+          title: 'Are you sure?',
+          text: "You won't be able to revert this!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, delete it!'
+          }).then((result) => {
+          if (result.isConfirmed) {
+              Swal.fire(
+              'Deleted!',
+              'Your file has been deleted.',
+              'success',
+              )
+              form.submit();
+          }
+          })
+      });
+  </script>
 </div>
 
 <table class="table table-bordered">

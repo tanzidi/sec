@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+from django.http import HttpResponseRedirect
 from .models import Session, Exam, Semester, Student, Result
 import pandas as pd
 import json
@@ -52,13 +53,24 @@ def add_session(request):
         new_session.name = name
         new_session.courses = json.dumps(course_list, indent=4)
         new_session.save()
-    return render(request, 'add_session.html', {})
+        return redirect('add_session')
+    session_obj = Session.objects.all()
+    return render(request, 'add_session.html', {'sessions' : session_obj})
 
 def view_session(request, year):
-    session = Session.objects.get(year=year)
-    name = session.name
-    courses = json.loads(session.courses)
-    return render(request, 'view_session.html', {'year' : year, 'name' : name, 'courses' : courses})
+    if request.user.is_authenticated and request.user.is_superuser:
+        session = Session.objects.get(year=year)
+        name = session.name
+        courses = json.loads(session.courses)
+        student_obj = Student.objects.filter(session=session)
+        context = {}
+        context['year'] = year
+        context['name'] = name
+        context['courses'] = courses
+        context['students'] = student_obj
+        return render(request, 'view_session.html', context)
+    else:
+      return redirect('home')
 
 
 def lg_cal(n):
@@ -146,57 +158,65 @@ def gen (df, reg, credit_list, title_list):
     return ret
 
 def add_result(request, session, semester):
-    try:
-        session_obj = Session.objects.get(year=session)
-        semester_obj = Semester.objects.get(id=semester)
-        exam = Exam.objects.get(session=session_obj, semester=semester_obj)
+    if request.user.is_authenticated and request.user.is_superuser:
+        try:
+            session_obj = Session.objects.get(year=session)
+            semester_obj = Semester.objects.get(id=semester)
+            exam = Exam.objects.get(session=session_obj, semester=semester_obj)
 
-        courses = json.loads(session_obj.courses)
-        title_list = {}
-        credit_list = {}
-        for course in courses:
-            title_list[course['code']] = course['title']
-            credit_list[course['code']] = course['credit']
-        
-        if request.method == 'POST':
-            file = request.FILES['upload_file']
-            df = pd.read_excel(file)
-            cols = df.columns
-            regis = list(df[cols[1]])
-            for i in regis:
-                ret = gen(df=df, reg=i, credit_list=credit_list, title_list=title_list)
+            courses = json.loads(session_obj.courses)
+            title_list = {}
+            credit_list = {}
+            for course in courses:
+                title_list[course['code']] = course['title']
+                credit_list[course['code']] = course['credit']
+            
+            if request.method == 'POST':
+                file = request.FILES['upload_file']
+                df = pd.read_excel(file)
+                cols = df.columns
+                regis = list(df[cols[1]])
+                for i in regis:
+                    ret = gen(df=df, reg=i, credit_list=credit_list, title_list=title_list)
+                    try:
+                        result = Result()
+                        result.regi = i
+                        result.exam = exam
+                        ret['held'] = exam.held
+                        result.result = json.dumps(ret, indent=4)
+                        result.save()
+                    except:
+                        pass
+        except:
+            messages.error(request, "No exam found add an exam first")
+            return redirect('teacher')
+        try:
+            exam_obj = Exam.objects.get(semester=semester_obj, session=session_obj)
+            result_obj = Result.objects.filter(exam=exam_obj)
+            results = []
+            for i in result_obj:
+                individual = {}
                 try:
-                    student = Student.objects.get(regi=i)
-                    result = Result()
-                    result.student = student
-                    result.exam = exam
-                    ret['held'] = exam.held
-                    result.result = json.dumps(ret, indent=4)
-                    result.save()
+                    student_obj = Student.objects.get(regi=i.regi)
+                    individual['student'] = student_obj
                 except:
                     pass
-    except:
-        messages.error(request, "No exam found add an exam first")
-        return redirect('teacher')
-    try:
-        exam_obj = Exam.objects.get(semester=semester_obj, session=session_obj)
-        result_obj = Result.objects.filter(exam=exam_obj)
-        results = []
-        for i in result_obj:
-            individual = {}
-            individual['student'] = i.student
-            individual['result_id'] = i.id
-            results.append(individual)
-        context = {}
-        context['status'] = 2
-        context['results'] = results
-        context['session'] = session
-        context['semester'] = semester_obj.name
-        context['exam_id'] = exam_obj.id
-        return render(request, 'add_result.html', context)
-    except:
-        return render(request, 'add_result.html', {'status' : 1})
-    return render(request, 'add_result.html', {})
+                individual['regi'] = i.regi
+                individual['result_id'] = i.id
+                results.append(individual)
+            context = {}
+            context['status'] = 2
+            context['results'] = results
+            context['session'] = session
+            context['semester'] = semester_obj.name
+            context['exam_id'] = exam_obj.id
+            return render(request, 'add_result.html', context)
+        except:
+            return render(request, 'add_result.html', {'status' : 1})
+        # return render(request, 'add_result.html', {})
+    else:
+        messages.error(request, "You must be a teacher")
+        return redirect('home')
 
 
 def student(request):
@@ -239,7 +259,7 @@ def result(request, session, semester):
             semester_obj = Semester.objects.get(id=semester)
             try:
                 exam_obj = Exam.objects.get(session=session_obj, semester=semester_obj)
-                result_obj = Result.objects.get(student=student_obj, exam=exam_obj)
+                result_obj = Result.objects.get(regi=student_obj.regi, exam=exam_obj)
                 result_r = result_obj.result
                 result = json.loads(result_r)
                 context = {}
@@ -269,12 +289,14 @@ def teacher(request):
             return render(request, 'teacher.html', {'status' : 1, 'session' : session, 'semesters' : semesters, 'sessions' : sessions}) 
         return render(request, 'teacher.html', {'sessions' : sessions})
     else:
+        messages.error(request, "You must be a teacher")
         return redirect('home')
 
 def teacher_result(request, result_id):
     if request.user.is_authenticated and request.user.is_superuser:
         result_obj = Result.objects.get(id=result_id)
-        student_obj = result_obj.student
+        student_obj = Student.objects.get(regi=result_obj.regi)
+        # print(student_obj)
         semester = result_obj.exam.semester.name
         result = json.loads(result_obj.result)
         context = {}
@@ -282,18 +304,24 @@ def teacher_result(request, result_id):
         context['sem_final'] = result['sem_final']
         context['student'] = student_obj
         context['semester'] = semester
+        context['semester_id'] = result_obj.exam.semester.id
+        context['regi'] = result_obj.regi
         context['result_id'] = result_id
         return render(request, 'teacher_result.html', context)
     else:
+        messages.error(request, "You must be a teacher")
         return redirect('home')
     
 def delete_result(request):
     if request.user.is_authenticated and request.user.is_superuser:
         if request.method == 'POST':
             obj = Result.objects.get(id=request.POST['result_id'])
+            next = "/add_result" + request.POST['next']
             obj.delete()
-        return redirect('teacher')
+
+        return HttpResponseRedirect(next)
     else:
+        messages.error(request, "You must be a teacher")
         return redirect('home')
 
 def delete_results(request):
@@ -302,6 +330,41 @@ def delete_results(request):
             exam_obj = Exam.objects.get(id=request.POST['exam_id'])
             result_obj = Result.objects.filter(exam=exam_obj)
             result_obj.delete()
-        return redirect('teacher')
+            next = request.POST['next']
+            return HttpResponseRedirect(next)
     else:
+        messages.error(request, "You must be a teacher")
         return redirect('home')
+    
+def add_exam(request):
+    if request.user.is_authenticated and request.user.is_superuser:
+        if request.method == 'POST':
+            session_obj = Session.objects.get(id=request.POST['session'])
+            semester_obj = Semester.objects.get(id=request.POST['semester'])
+            exam_obj = Exam()
+            exam_obj.session = session_obj
+            exam_obj.semester = semester_obj
+            exam_obj.held = request.POST['held']
+            exam_obj.save()
+        session_obj = Session.objects.all()
+        semester_obj = Semester.objects.all()
+        exam_list = []
+        for i in session_obj:
+            exam_obj = Exam.objects.filter(session=i)
+            exam_indi = {}
+            exam_indi['session'] = i.year
+            exlist = []
+            for j in exam_obj:
+                exlist.append(j)
+            exam_indi['exams'] = exlist
+            exam_list.append(exam_indi)
+        context = {}
+        context['sessions'] = session_obj
+        context['semesters'] = semester_obj
+        context['exam_list'] = exam_list
+        return render(request, 'add_exam.html', context) 
+    else:
+        messages.error(request, "You must be a teacher")
+        return redirect('home')
+def gradesheet(request):
+    return render(request, 'gradesheet.html', {})

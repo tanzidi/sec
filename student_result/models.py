@@ -12,7 +12,7 @@ class Session(models.Model):
 class Student(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     user_id = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
-    regi = models.CharField(max_length=15)
+    regi = models.CharField(max_length=15, unique=True)
     name = models.CharField(max_length=100)
     email = models.CharField(max_length=100)
     phone = models.CharField(max_length=20)
@@ -39,8 +39,8 @@ class Exam(models.Model):
     
 class Result(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
-    student = models.ForeignKey(Student, null=True, on_delete=models.CASCADE)
+    regi = models.CharField(max_length=20)
     exam = models.ForeignKey(Exam, null=True, on_delete=models.CASCADE)
     result = models.TextField()
     def __str__(self):
-        return(f"{self.student} {self.exam}")
+        return(f"{self.regi} {self.exam}")

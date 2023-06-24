@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr;">
+        <div style="width: 35em;">
+            <h3>Add New Exam</h3>
+            <form method='POST' action="">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="session">Select Session</label>
+                    <select class="form-control" id="session" name="session">
+                        {% for session in sessions %}
+                            <option value="{{ session.id }}">{{ session }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="semester">Select Semester</label>
+                    <select class="form-control" id="semester" name="semester">
+                        {% for semester in semesters %}
+                            <option value="{{ semester.id }}">{{ semester }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="held">Held On</label>
+                    <input type="text" name="held" class="form-control" id="held" placeholder="Ex. December 2019">
+                </div>
+                <button type="submit" class="btn btn-primary">Add Exam</button>
+            </form>
+        </div>
+        <div>
+        <h3>Registered Exams</h3>
+        {% for i in exam_list %}
+            <h5>{{ i.session }}</h5>
+            <ul>
+                {% for j in i.exams %}
+                    <li>{{ j }}</li>
+                {% endfor %}
+            </ul>
+            
+        {% endfor %}
+        </div>
+    </div>
+{% endblock content %}

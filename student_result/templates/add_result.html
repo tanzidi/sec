@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
+    <h3>Add Batchwise Result</h3>
     <div style="display: grid; grid-template-columns: 1fr 1fr; width: 50em;">
         <div style="width: 30em;">
             <form method = "POST" action="" enctype="multipart/form-data">
@@ -9,17 +10,44 @@
                     <input class="form-control" type="file" id="upload_file" name="upload_file">
                 </div>
                 <!-- <input type="file" name="upload_file"/> -->
-                <button type="submit" name="submit" class="btn btn-primary">Upload</button>
+                <button type="submit" class="btn btn-primary">Upload</button>
                 <!-- <input type="submit" name="submit" value="Submit"/> -->
             </form>
         </div>
         <div style="display: grid; align-items: center; justify-content: center;">
-            <form method='POST' action="{% url 'delete_results' %}">
+            <form id="delete_form" method='POST' action="{% url 'delete_results' %}">
                 {% csrf_token %}
                 <input type="text" name="exam_id" value="{{ exam_id }}" hidden>
-                <button type="submit" name="submit" class="btn btn-danger">Delete All</button>
+                <input type="text" name="next" value="{{ request.path }}" hidden>
+                <button type="submit" class="btn btn-danger">Delete All</button>
             </form>
         </div>
+        <script>
+            document.getElementById('delete_form').addEventListener('submit', function(e) {
+                let form = this
+                console.log(form)
+                console.log('hi')
+                e.preventDefault();
+                Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire(
+                    'Deleted!',
+                    'Your file has been deleted.',
+                    'success',
+                    )
+                    form.submit();
+                }
+                })
+            });
+        </script>
     </div>
     <div style="margin-top: 2em; width: 50em;">
     {% if status == 1 %}
@@ -40,8 +68,14 @@
               {% for i in results %}
                 <tr>                
                     <td>{{ forloop.counter }}</td>
-                    <td>{{ i.student.name }}</td>
-                    <td>{{ i.student.regi }}</td>
+                    <td>
+                        {% if i.student.name %}
+                            {{ i.student.name }}
+                        {% else %}
+                            Not Registered
+                        {% endif %}
+                    </td>
+                    <td>{{ i.regi }}</td>
                     <td><a href="{% url 'teacher_result' i.result_id %}">View Result</a></td>
                 </tr>
               {% endfor %}
