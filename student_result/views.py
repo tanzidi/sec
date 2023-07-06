@@ -1,3 +1,4 @@
+import datetime
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
@@ -5,6 +6,17 @@ from django.http import HttpResponseRedirect
 from .models import Session, Exam, Semester, Student, Result
 import pandas as pd
 import json
+import numpy as np
+
+class NpEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        if isinstance(obj, np.floating):
+            return float(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return super(NpEncoder, self).default(obj)
 
 def home(request):
     if request.user.is_authenticated:
@@ -177,15 +189,20 @@ def add_result(request, session, semester):
                 cols = df.columns
                 regis = list(df[cols[1]])
                 for i in regis:
-                    ret = gen(df=df, reg=i, credit_list=credit_list, title_list=title_list)
+                    try:
+                        ret = gen(df=df, reg=i, credit_list=credit_list, title_list=title_list)
+                    except:
+                        messages.error("problem with parsing file")
+                        pass
                     try:
                         result = Result()
                         result.regi = i
                         result.exam = exam
                         ret['held'] = exam.held
-                        result.result = json.dumps(ret, indent=4)
+                        result.result = json.dumps(ret, indent=4, cls=NpEncoder)
                         result.save()
                     except:
+                        messages.erro(request, "error uploading resutl")
                         pass
         except:
             messages.error(request, "No exam found add an exam first")
@@ -241,7 +258,9 @@ def student(request):
             student = Student.objects.get(user_id=request.user)
             if student :
                 semesters = Semester.objects.all()
-                return render(request, 'student.html', {'status' : 1, 'student' : student, 'semesters' : semesters})
+                results = Result.objects.filter(regi=student.regi)
+                # print(results)
+                return render(request, 'student.html', {'status' : 1, 'student' : student, 'semesters' : semesters, 'results' : results})
             else:
                 sessions = Session.objects.all()
                 return render(request, 'student.html', {'status' : 0, 'sessions' : sessions})
@@ -251,24 +270,24 @@ def student(request):
     messages.error(request, "oops you need to login first!")
     return redirect('home')
 
-def result(request, session, semester):
+def result(request, result_id):
     if request.user.is_authenticated:
         try:
             student_obj = Student.objects.get(user_id = request.user)
-            session_obj = Session.objects.get(year=session)
-            semester_obj = Semester.objects.get(id=semester)
             try:
-                exam_obj = Exam.objects.get(session=session_obj, semester=semester_obj)
-                result_obj = Result.objects.get(regi=student_obj.regi, exam=exam_obj)
+                result_obj = Result.objects.get(id=result_id)
+                if result_obj.regi != student_obj.regi:
+                    messages.error(request, "Not allowed to see the result!")
+                    return redirect('student')
                 result_r = result_obj.result
                 result = json.loads(result_r)
                 context = {}
                 context['sem_full'] = result['sem_full']
                 context['sem_final'] = result['sem_final']
-                context['held'] = exam_obj.held
+                context['held'] = result_obj.exam.held
                 context['student'] = student_obj
-                context['semester'] = semester_obj
-                print(context)
+                context['semester'] = result_obj.exam.semester
+                # print(context)
                 return render(request, 'result.html', context)
             except:
                 messages.error(request, "no result found")
@@ -295,7 +314,7 @@ def teacher(request):
 def teacher_result(request, result_id):
     if request.user.is_authenticated and request.user.is_superuser:
         result_obj = Result.objects.get(id=result_id)
-        student_obj = Student.objects.get(regi=result_obj.regi)
+        student_obj = Student.objects.filter(regi=result_obj.regi)
         # print(student_obj)
         semester = result_obj.exam.semester.name
         result = json.loads(result_obj.result)
@@ -367,4 +386,80 @@ def add_exam(request):
         messages.error(request, "You must be a teacher")
         return redirect('home')
 def gradesheet(request):
-    return render(request, 'gradesheet.html', {})
+    if request.user.is_authenticated and request.user.is_superuser:
+        return render(request, 'gradesheet.html', {})
+    else:
+        messages.error(request, "You must be a teacher")
+        return redirect('home')
+
+def gen_gradesheet(request):
+    if request.user.is_authenticated and request.user.is_superuser:
+        if request.method == 'POST':
+            regi = request.POST['regi']
+            # try:
+            student_obj = Student.objects.get(regi=regi)
+            result_obj = Result.objects.filter(regi=regi)
+            
+            held = []
+            sem_fulls = []
+            sem_finals = []
+            for i in range(0, 9):
+                held.append("##########")
+                sem_fulls.append("##########")
+                sem_finals.append("##########")
+            j = 0
+            for res in result_obj:
+                held[j] = res.exam.held
+                r = json.loads(res.result)
+                sem_fulls[j] = (r['sem_full'])
+                sem_finals[j] = (r['sem_final'])
+                j = j + 1
+            print(sem_fulls)
+            print(sem_finals)
+            x = datetime.datetime.now()
+            now = x.strftime("%d") + "-" + x.strftime("%b") + "-" + x.strftime("%y")
+            s = str(student_obj.session)
+            context = {
+                "name" : student_obj.name,
+                "reg" : regi,
+                "session" : student_obj.session.year,
+                "year" : s.split('-')[0],
+                "now" : now,
+                "h1" : held[0],
+                "h2" : held[1], 
+                "h3" : held[2], 
+                "h4" : held[3], 
+                "h5" : held[4], 
+                "h6" : held[5],  
+                "h7" : held[6],  
+                "h8" : held[7], 
+                "h8_ex" : held[8],  
+                "sem1" : sem_fulls[0],
+                "sem1_final" : sem_finals[0],
+                "sem2" : sem_fulls[1],
+                "sem2_final" : sem_finals[1],
+                "sem3" : sem_fulls[2],
+                "sem3_final" : sem_finals[2],
+                "sem4" : sem_fulls[3],
+                "sem4_final" : sem_finals[3],
+                "sem5" : sem_fulls[4],
+                "sem5_final" : sem_finals[4],
+                "sem6" : sem_fulls[5],
+                "sem6_final" : sem_finals[5],
+                "sem7" : sem_fulls[6],
+                "sem7_final" : sem_finals[6],
+                "sem8" : sem_fulls[7],
+                "sem8_final" : sem_finals[7],
+                "sem8_ex" : sem_fulls[8],
+                "sem8_ex_final" : sem_finals[8],
+            }
+            print(context)
+            return render(request, 'gen_gradesheet.html', context)
+            # except:
+                # messages.error(request, "No result found!")
+                # return redirect('gradesheet')
+        else:
+            return redirect('gradesheet')
+    else:
+        messages.error(request, "You must be a teacher")
+        return redirect('home')

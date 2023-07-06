@@ -22,12 +22,12 @@
     <div class="col-sm-6">
       <div class="card">
         <div class="card-body">
-          <h2 class="card-title">Result Query</h2>
+          <h2 class="card-title">Results</h2>
           <p class="card-text">
                 <ul>
-                {% for semester in semesters %}
-                    <li><a href="{% url 'result' student.session.year semester.id %}">{{ semester.name }}</a></li>
-                {% endfor %}
+                    {% for result in results %}
+                        <li><a href="{% url 'result' result.id %}">{{ result.exam }}</a></li>
+                    {% endfor %}
                 </ul>
             </p>
           <!-- <a href="#" class="btn btn-primary">Go somewhere</a> -->

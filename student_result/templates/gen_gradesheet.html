@@ -1,0 +1,717 @@
+
+{% load static %}
+<!DOCTYPE html>
+    <head>
+        <style>
+            @media print {
+                .container {page-break-after: always;}
+                html, body {
+                    height: 99%;    
+                }
+                @page { margin: 0; }
+                #printPageButton {
+                    display: none;
+                }
+                #print {
+                    display: block !important;
+                }
+                #no_print {
+                    display: none;
+                }
+            }
+            
+            @page {
+                size: 21cm 29.7cm;
+                margin: 7mm 10mm 7mm 12mm;
+            }
+            #print {
+                display: none;
+            }
+            /* #print {
+                height: 29.7cm;
+            } */
+            #print > .container:not(:first-child) {
+                margin-top: 0em;
+            }
+            *{
+                padding: 0;
+                margin: 0;
+                font-family: Calibri, sans-serif;
+            }
+            body {
+                width: 21cm;
+            }
+            p {
+                font-size: .9em;
+            }
+            .container {
+                display : grid;
+                grid-template-rows: .5fr .5fr 2fr 2fr;
+                position: relative;
+                height: 28.7cm;
+            }
+            
+            .heading {
+                display: grid;
+                grid-template-columns: .45fr 3fr;
+                line-height: 2.3em;
+            }
+            .heading_title {
+                display: grid;
+                line-height: 1.6em;
+                padding-left: .3em;
+            }
+            .f {
+                font-weight: bold;
+            }
+            .title_right {
+                position: absolute;
+                margin-top: 3em;
+                margin-left: 44em;
+                font-size: .70em;
+                /* border: 1px solid red; */
+                display: grid;
+                justify-content: right;
+            }
+            .title_right_container {
+                /* height: 17em; */
+                line-height: .9em;
+                width: 23em;
+                /* border: 1px solid red; */
+                display: grid;
+                grid-template-columns: 1.5fr .8fr .8fr;
+                border-left: .5px solid black;
+                border-top: .5px solid black;
+                border-bottom: .5px solid black;
+                font-size: 1.1em;
+            }
+            .title_right_container > span:nth-child(1) {
+                border-bottom: .5px solid black;
+            }
+            .title_right_container > span:nth-child(2) {
+                border-bottom: .5px solid black;
+                padding-left: 0px !important;
+                text-align: center;
+            }
+            .title_right_container > span:nth-child(3) {
+                border-bottom: .5px solid black;
+                padding-left: 0px !important;
+                text-align: center;
+            }
+            .title_right_container > span {
+                border-right: .5px solid black;
+                padding-left: .3em;
+                padding: .1em;
+            }
+            .title_right_container > span:nth-child(3n+2) {
+                padding-left: 40%;
+            }
+            .title_right_container > span:nth-child(3n+3) {
+                padding-left: 35%;
+            }
+            .heading_logo {
+                display: grid;
+                align-items: center;
+                justify-content: center;
+            }
+            .logo {
+                /* padding-left: 2em; */
+                height: 4.9em;
+                /* width: 5em; */
+            }
+            
+            .info {
+                width: 60%;
+                display: grid;
+                font-size: .85em;
+                grid-template-columns: 2fr .2fr 4.5fr;
+                line-height: 1.5em;
+            }
+            .table {
+                font-size: 0.8em;
+                display: grid;
+                line-height: 1.1em;
+                grid-template-columns: .5fr 2fr .3fr .5fr .5fr;
+            }
+            /* .table > span {
+                border: 1px solid black;
+            } */
+            .table > span:nth-child(-n + 4) {
+                border-bottom: 1px solid black;
+                padding-bottom: .2em;
+                font-weight: bold;
+                text-align: center;
+            }
+            .table > span:nth-child(-n + 3) {
+                display: grid;
+                align-items: center;
+                justify-content: center;
+            }
+            .table > span {
+                /* padding-top: .3em; */
+                padding: .15em 0em .15em .2em;
+                text-align: center;
+                border-left: .5px solid black;
+                border-bottom: .5px solid black;
+            }
+            .table > span:nth-child(4) {
+                grid-column: 4/6;
+            }
+            .table > span:nth-child(5n + 4) {
+                text-align: center;
+                border-right: .5px solid black;
+            }
+            .table > span:nth-child(1) {
+                border-top: .5px solid black;
+            }
+            .table > span:nth-child(2) {
+                border-top: .5px solid black;
+            }
+            .table > span:nth-child(3) {
+                border-top: .5px solid black;
+            }
+            .table > span:nth-child(4) {
+                border-top: .5px solid black;
+            }
+            .double_row {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+            }
+            .double_row > span:nth-child(1) {
+                grid-column: 1/3;
+                border-bottom: .5px solid black;
+            }
+            .double_row > span:nth-child(3) {
+                border-left: .5px solid black;
+            }
+            .left {
+                text-align: left !important;
+            }
+            .right {
+                text-align: left !important;
+                margin-left: 15em !important;
+                font-weight: bold;
+            }
+            .teacher {
+                position: absolute;
+                font-size: .8em;
+                margin-top: 91em;
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr 1.7fr;
+                align-items: center;
+                align-items: center;
+                text-align: center;
+                width: 100%;
+                font-style: italic;
+            }
+            .teacher > div:first-child {
+                text-align: left;
+            }
+            .teacher > div:not(:first-child) {
+                display: grid;
+                align-items: center;
+                justify-content: center;
+                width: 80%;
+                padding-top: .5em;
+                text-align: center;
+                border-top: 1px;
+                border-style: dotted none none none;
+            }
+            .total_com {
+                width: 100%;
+                line-height: 1.55em;
+            }
+            .total_com_container {
+                display: grid;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                font-weight: bold;
+            }
+            .total_com_container_table {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr 1fr;
+            }
+            .total_com_container_table > span {
+                font-size: 1.1em;
+            }
+        </style>
+    </head>
+    <body>
+        <script>
+            window.print();
+        </script>
+        <div id="no_print" style="margin-left: 1em">Please click the button if the print window is not opening ! </div>
+        <button id="printPageButton" onclick="window.print()" style="margin-left: 1em; margin-top: .3em; border: 0px; border: .2px solid black; border-radius: .2em; cursor: pointer; background-color: #3B71CA; color: white; font-weight: bold; font-size: 1.5em; padding: .2em 1.2em;">Print</button>
+        <div id="print">
+            
+            <!-- semester-1-2  -->
+            <div class="container">
+                <div class="heading">
+                    <div class="heading_logo">
+                        <img class="logo" src="{% static 'logo.png' %}">
+                    </div>
+                    <div class="heading_title">
+                        <p style="font-size: 1.20em; font-weight: bold;">SHAHJALAL UNIVERSITY OF SCIENCE & TECHNOLOGY, SYLHET, BANGLADESH.</p>
+                        <p style="font-size:1.15em;">Grade Certificte</p>
+                        <p>B.Sc. in (Engg.) Examination</p>
+                        <p>Session : {{session}}</p>
+                    </div>
+                </div>
+                <div class="info">
+                    <span>Institution</span><span>:</span><span>Sylhet Engineering College, Sylhet</span>
+                    <span style="padding-bottom: .5em;">Department</span><span>:</span><span class="f">Computer Science & Engineering</span>
+                    <span>Registration No.</span><span>:</span><span>{{reg}}</span>
+                    <span>Student's Name</span><span>:</span><span>{{name}}</span>
+                </div>
+                <div class="title_right">
+                    <div class="title_right_container">
+                        <span >Numeric Grade</span><span>Letter Grade</span><span>Grade Point</span>
+                        <span>80% or above</span><span>A+</span><span>4.00</span>
+                        <span>75% to less than 80%</span><span>A</span><span>3.75</span>
+                        <span>70% to less than 75%</span><span>A-</span><span>3.50</span>
+                        <span>65% to less than 70%</span><span>B+</span><span>3.25</span>
+                        <span>60% to less than 65%</span><span>B</span><span>3.00</span>
+                        <span>55% to less than 60%</span><span>B-</span><span>2.75</span>
+                        <span>50% to less than 55%</span><span>C+</span><span>2.50</span>
+                        <span>45% to less than 50%</span><span>C</span><span>2.25</span>
+                        <span>40% to less than 45%</span><span>C-</span><span>2.00</span>
+                        <span>less than 40%</span><span>F</span><span>0.00</span>
+                    </div>
+                </div>
+
+                <div class="semester">
+                    <div style="padding-top: 1.3em; padding-bottom: 1em; font-size: .8em; display: grid; grid-template-columns: 3fr 1fr;">
+                        <div style="margin-left: 1.5em; font-weight: bold;">First Year First Semester {{year}}</div>
+                        <div style="font-weight: bold;">Held on: {{h1}}</div>
+                    </div>
+                    <div class="table">
+                        <span>Course No.</span><span class="left">Course Title</span><span>Credit</span><span style="padding: 0;"><div class="double_row"><span>Grade Obtained</span><span>Grade Point</span><span>Letter Grade</span></div></span>
+                        {% if sem1 %}
+                            {% for i in sem1 %}
+                                <span>{{i.code}}</span><span class="left">{{i.title}}</span><span>{{i.cr}}</span><span>{{i.gp}}</span><span>{{i.lg}}</span>
+                            {% endfor %}
+                        {% endif %}
+                        <span style="border: 0px !important"></span><span class="right">This Semester Total :</span><span>{{sem1_final.cr_cur}}</span><span>{{sem1_final.gp_cur}}</span><span>{{sem1_final.lg_cur}}</span>
+                        <span style="border: 0px !important"></span><span class="right">Cumulative :</span><span>{{sem1_final.cr_com}}</span><span>{{sem1_final.gp_com}}</span><span>{{sem1_final.lg_com}}</span>
+                    </div>
+                </div>
+
+                <div class="semester">
+                    <div style="padding-top: 1.3em; padding-bottom: 1em; font-size: .8em; display: grid; grid-template-columns: 3fr 1fr;">
+                        <div style="margin-left: 1.5em; font-weight: bold;">First Year Second Semester {{year}}</div>
+                        <div style="font-weight: bold;">Held on: {{h2}}</div>
+                    </div>
+                    <div class="table">
+                        <span>Course No.</span><span class="left">Course Title</span><span>Credit</span><span style="padding: 0;"><div class="double_row"><span>Grade Obtained</span><span>Grade Point</span><span>Letter Grade</span></div></span>
+                        {% if sem2 %}
+                            {% for i in sem2 %}
+                                <span>{{i.code}}</span><span class="left">{{i.title}}</span><span>{{i.cr}}</span><span>{{i.gp}}</span><span>{{i.lg}}</span>
+                            {% endfor %}
+                        {% endif %}
+                        <span style="border: 0px !important"></span><span class="right">This Semester Total :</span><span>{{sem2_final.cr_cur}}</span><span>{{sem2_final.gp_cur}}</span><span>{{sem2_final.lg_cur}}</span>
+                        <span style="border: 0px !important"></span><span class="right">Cumulative :</span><span>{{sem2_final.cr_com}}</span><span>{{sem2_final.gp_com}}</span><span>{{sem2_final.lg_com}}</span>
+                    </div>
+                </div>
+                
+                <div class="teacher">
+                    <div style="font-size: .9em;">
+                        <b>Printed on :</b> {{ now }}
+                    </div>
+                    <div>Prepared by</div><div>Compared by</div><div>Deputy Controller of Examination</div>
+                </div>
+            </div>
+
+            <!-- semester-3-4  -->
+            <div class="container">
+                <div class="heading">
+                    <div class="heading_logo">
+                        <img class="logo" src="{% static 'logo.png' %}">
+                    </div>
+                    <div class="heading_title">
+                        <p style="font-size: 1.20em; font-weight: bold;">SHAHJALAL UNIVERSITY OF SCIENCE & TECHNOLOGY, SYLHET, BANGLADESH.</p>
+                        <p style="font-size:1.15em;">Grade Certificte</p>
+                        <p>B.Sc. in (Engg.) Examination</p>
+                        <p>Session : {{session}}</p>
+                    </div>
+                </div>
+                <div class="info">
+                    <span>Institution</span><span>:</span><span>Sylhet Engineering College, Sylhet</span>
+                    <span style="padding-bottom: .5em;">Department</span><span>:</span><span class="f">Computer Science & Engineering</span>
+                    <span>Registration No.</span><span>:</span><span>{{reg}}</span>
+                    <span>Student's Name</span><span>:</span><span>{{name}}</span>
+                </div>
+                <div class="title_right">
+                    <div class="title_right_container">
+                        <span >Numeric Grade</span><span>Letter Grade</span><span>Grade Point</span>
+                        <span>80% or above</span><span>A+</span><span>4.00</span>
+                        <span>75% to less than 80%</span><span>A</span><span>3.75</span>
+                        <span>70% to less than 75%</span><span>A-</span><span>3.50</span>
+                        <span>65% to less than 70%</span><span>B+</span><span>3.25</span>
+                        <span>60% to less than 65%</span><span>B</span><span>3.00</span>
+                        <span>55% to less than 60%</span><span>B-</span><span>2.75</span>
+                        <span>50% to less than 55%</span><span>C+</span><span>2.50</span>
+                        <span>45% to less than 50%</span><span>C</span><span>2.25</span>
+                        <span>40% to less than 45%</span><span>C-</span><span>2.00</span>
+                        <span>less than 40%</span><span>F</span><span>0.00</span>
+                    </div>
+                </div>
+
+                <div class="semester">
+                    <div style="padding-top: 1.3em; padding-bottom: 1em; font-size: .8em; display: grid; grid-template-columns: 3fr 1fr;">
+                        <div style="margin-left: 1.5em; font-weight: bold;">Second Year First Semester {{year}}</div>
+                        <div style="font-weight: bold;">Held on: {{h3}}</div>
+                    </div>
+                    <div class="table">
+                        <span>Course No.</span><span class="left">Course Title</span><span>Credit</span><span style="padding: 0;"><div class="double_row"><span>Grade Obtained</span><span>Grade Point</span><span>Letter Grade</span></div></span>
+                        {% if sem3 %}
+                            {% for i in sem3 %}
+                                <span>{{i.code}}</span><span class="left">{{i.title}}</span><span>{{i.cr}}</span><span>{{i.gp}}</span><span>{{i.lg}}</span>
+                            {% endfor %}
+                        {% endif %}
+                        <span style="border: 0px !important"></span><span class="right">This Semester Total :</span><span>{{sem3_final.cr_cur}}</span><span>{{sem3_final.gp_cur}}</span><span>{{sem3_final.lg_cur}}</span>
+                        <span style="border: 0px !important"></span><span class="right">Cumulative :</span><span>{{sem3_final.cr_com}}</span><span>{{sem3_final.gp_com}}</span><span>{{sem3_final.lg_com}}</span>
+                    </div>
+                </div>
+
+                <div class="semester">
+                    <div style="padding-top: 1.3em; padding-bottom: 1em; font-size: .8em; display: grid; grid-template-columns: 3fr 1fr;">
+                        <div style="margin-left: 1.5em; font-weight: bold;">Second Year Second Semester {{year}}</div>
+                        <div style="font-weight: bold;">Held on: {{h4}}</div>
+                    </div>
+                    <div class="table">
+                        <span>Course No.</span><span class="left">Course Title</span><span>Credit</span><span style="padding: 0;"><div class="double_row"><span>Grade Obtained</span><span>Grade Point</span><span>Letter Grade</span></div></span>
+                        {% if sem4 %}
+                            {% for i in sem4 %}
+                                <span>{{i.code}}</span><span class="left">{{i.title}}</span><span>{{i.cr}}</span><span>{{i.gp}}</span><span>{{i.lg}}</span>
+                            {% endfor %}
+                        {% endif %}
+                        <span style="border: 0px !important"></span><span class="right">This Semester Total :</span><span>{{sem4_final.cr_cur}}</span><span>{{sem4_final.gp_cur}}</span><span>{{sem4_final.lg_cur}}</span>
+                        <span style="border: 0px !important"></span><span class="right">Cumulative :</span><span>{{sem4_final.cr_com}}</span><span>{{sem4_final.gp_com}}</span><span>{{sem4_final.lg_com}}</span>
+                    </div>
+                </div>
+                
+                <div class="teacher">
+                    <div style="font-size: .9em;">
+                        <b>Printed on :</b> {{ now }}
+                    </div>
+                    <div>Prepared by</div><div>Compared by</div><div>Deputy Controller of Examination</div>
+                </div>
+            </div>
+
+            <!-- semester-5-6  -->
+            <div class="container">
+                <div class="heading">
+                    <div class="heading_logo">
+                        <img class="logo" src="{% static 'logo.png' %}">
+                    </div>
+                    <div class="heading_title">
+                        <p style="font-size: 1.20em; font-weight: bold;">SHAHJALAL UNIVERSITY OF SCIENCE & TECHNOLOGY, SYLHET, BANGLADESH.</p>
+                        <p style="font-size:1.15em;">Grade Certificte</p>
+                        <p>B.Sc. in (Engg.) Examination</p>
+                        <p>Session : {{session}}</p>
+                    </div>
+                </div>
+                <div class="info">
+                    <span>Institution</span><span>:</span><span>Sylhet Engineering College, Sylhet</span>
+                    <span style="padding-bottom: .5em;">Department</span><span>:</span><span class="f">Computer Science & Engineering</span>
+                    <span>Registration No.</span><span>:</span><span>{{reg}}</span>
+                    <span>Student's Name</span><span>:</span><span>{{name}}</span>
+                </div>
+                <div class="title_right">
+                    <div class="title_right_container">
+                        <span >Numeric Grade</span><span>Letter Grade</span><span>Grade Point</span>
+                        <span>80% or above</span><span>A+</span><span>4.00</span>
+                        <span>75% to less than 80%</span><span>A</span><span>3.75</span>
+                        <span>70% to less than 75%</span><span>A-</span><span>3.50</span>
+                        <span>65% to less than 70%</span><span>B+</span><span>3.25</span>
+                        <span>60% to less than 65%</span><span>B</span><span>3.00</span>
+                        <span>55% to less than 60%</span><span>B-</span><span>2.75</span>
+                        <span>50% to less than 55%</span><span>C+</span><span>2.50</span>
+                        <span>45% to less than 50%</span><span>C</span><span>2.25</span>
+                        <span>40% to less than 45%</span><span>C-</span><span>2.00</span>
+                        <span>less than 40%</span><span>F</span><span>0.00</span>
+                    </div>
+                </div>
+
+                <div class="semester">
+                    <div style="padding-top: 1.3em; padding-bottom: 1em; font-size: .8em; display: grid; grid-template-columns: 3fr 1fr;">
+                        <div style="margin-left: 1.5em; font-weight: bold;">Third Year First Semester {{year}}</div>
+                        <div style="font-weight: bold;">Held on: {{h5}}</div>
+                    </div>
+                    <div class="table">
+                        <span>Course No.</span><span class="left">Course Title</span><span>Credit</span><span style="padding: 0;"><div class="double_row"><span>Grade Obtained</span><span>Grade Point</span><span>Letter Grade</span></div></span>
+                        {% if sem5 %}
+                            {% for i in sem5 %}
+                                <span>{{i.code}}</span><span class="left">{{i.title}}</span><span>{{i.cr}}</span><span>{{i.gp}}</span><span>{{i.lg}}</span>
+                            {% endfor %}
+                        {% endif %}
+                        <span style="border: 0px !important"></span><span class="right">This Semester Total :</span><span>{{sem5_final.cr_cur}}</span><span>{{sem5_final.gp_cur}}</span><span>{{sem5_final.lg_cur}}</span>
+                        <span style="border: 0px !important"></span><span class="right">Cumulative :</span><span>{{sem5_final.cr_com}}</span><span>{{sem5_final.gp_com}}</span><span>{{sem5_final.lg_com}}</span>
+                    </div>
+                </div>
+
+                <div class="semester">
+                    <div style="padding-top: 1.3em; padding-bottom: 1em; font-size: .8em; display: grid; grid-template-columns: 3fr 1fr;">
+                        <div style="margin-left: 1.5em; font-weight: bold;">Third Year Second Semester {{year}}</div>
+                        <div style="font-weight: bold;">Held on: {{h6}}</div>
+                    </div>
+                    <div class="table">
+                        <span>Course No.</span><span class="left">Course Title</span><span>Credit</span><span style="padding: 0;"><div class="double_row"><span>Grade Obtained</span><span>Grade Point</span><span>Letter Grade</span></div></span>
+                        {% if sem6 %}
+                            {% for i in sem6 %}
+                                <span>{{i.code}}</span><span class="left">{{i.title}}</span><span>{{i.cr}}</span><span>{{i.gp}}</span><span>{{i.lg}}</span>
+                            {% endfor %}
+                        {% endif %}
+                        <span style="border: 0px !important"></span><span class="right">This Semester Total :</span><span>{{sem6_final.cr_cur}}</span><span>{{sem6_final.gp_cur}}</span><span>{{sem6_final.lg_cur}}</span>
+                        <span style="border: 0px !important"></span><span class="right">Cumulative :</span><span>{{sem6_final.cr_com}}</span><span>{{sem6_final.gp_com}}</span><span>{{sem6_final.lg_com}}</span>
+                    </div>
+                </div>
+                
+                <div class="teacher">
+                    <div style="font-size: .9em;">
+                        <b>Printed on :</b> {{ now }}
+                    </div>
+                    <div>Prepared by</div><div>Compared by</div><div>Deputy Controller of Examination</div>
+                </div>
+            </div>
+
+            {% if sem8_ex %}
+
+                <!-- semester-7-8  -->
+                <div class="container">
+                    <div class="heading">
+                        <div class="heading_logo">
+                            <img class="logo" src="{% static 'logo.png' %}">
+                        </div>
+                        <div class="heading_title">
+                            <p style="font-size: 1.20em; font-weight: bold;">SHAHJALAL UNIVERSITY OF SCIENCE & TECHNOLOGY, SYLHET, BANGLADESH.</p>
+                            <p style="font-size:1.15em;">Grade Certificte</p>
+                            <p>B.Sc. in (Engg.) Examination</p>
+                            <p>Session : {{session}}</p>
+                        </div>
+                    </div>
+                    <div class="info">
+                        <span>Institution</span><span>:</span><span>Sylhet Engineering College, Sylhet</span>
+                        <span style="padding-bottom: .5em;">Department</span><span>:</span><span class="f">Computer Science & Engineering</span>
+                        <span>Registration No.</span><span>:</span><span>{{reg}}</span>
+                        <span>Student's Name</span><span>:</span><span>{{name}}</span>
+                    </div>
+                    <div class="title_right">
+                        <div class="title_right_container">
+                            <span >Numeric Grade</span><span>Letter Grade</span><span>Grade Point</span>
+                            <span>80% or above</span><span>A+</span><span>4.00</span>
+                            <span>75% to less than 80%</span><span>A</span><span>3.75</span>
+                            <span>70% to less than 75%</span><span>A-</span><span>3.50</span>
+                            <span>65% to less than 70%</span><span>B+</span><span>3.25</span>
+                            <span>60% to less than 65%</span><span>B</span><span>3.00</span>
+                            <span>55% to less than 60%</span><span>B-</span><span>2.75</span>
+                            <span>50% to less than 55%</span><span>C+</span><span>2.50</span>
+                            <span>45% to less than 50%</span><span>C</span><span>2.25</span>
+                            <span>40% to less than 45%</span><span>C-</span><span>2.00</span>
+                            <span>less than 40%</span><span>F</span><span>0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="semester">
+                        <div style="padding-top: 1.3em; padding-bottom: 1em; font-size: .8em; display: grid; grid-template-columns: 3fr 1fr;">
+                            <div style="margin-left: 1.5em; font-weight: bold;">Fourth Year First Semester {{year}}</div>
+                            <div style="font-weight: bold;">Held on: {{h7}}</div>
+                        </div>
+                        <div class="table">
+                            <span>Course No.</span><span class="left">Course Title</span><span>Credit</span><span style="padding: 0;"><div class="double_row"><span>Grade Obtained</span><span>Grade Point</span><span>Letter Grade</span></div></span>
+                            {% if sem7 %}
+                                {% for i in sem7 %}
+                                    <span>{{i.code}}</span><span class="left">{{i.title}}</span><span>{{i.cr}}</span><span>{{i.gp}}</span><span>{{i.lg}}</span>
+                                {% endfor %}
+                            {% endif %}
+                            <span style="border: 0px !important"></span><span class="right">This Semester Total :</span><span>{{sem7_final.cr_cur}}</span><span>{{sem7_final.gp_cur}}</span><span>{{sem7_final.lg_cur}}</span>
+                            <span style="border: 0px !important"></span><span class="right">Cumulative :</span><span>{{sem7_final.cr_com}}</span><span>{{sem7_final.gp_com}}</span><span>{{sem7_final.lg_com}}</span>
+                        </div>
+                    </div>
+
+                    <div class="semester">
+                        <div style="padding-top: 1.3em; padding-bottom: 1em; font-size: .8em; display: grid; grid-template-columns: 3fr 1fr;">
+                            <div style="margin-left: 1.5em; font-weight: bold;">Fourth Year Second Semester {{year}}</div>
+                            <div style="font-weight: bold;">Held on: {{h8}}</div>
+                        </div>
+                        <div class="table">
+                            <span>Course No.</span><span class="left">Course Title</span><span>Credit</span><span style="padding: 0;"><div class="double_row"><span>Grade Obtained</span><span>Grade Point</span><span>Letter Grade</span></div></span>
+                            {% if sem8 %}
+                                {% for i in sem8 %}
+                                    <span>{{i.code}}</span><span class="left">{{i.title}}</span><span>{{i.cr}}</span><span>{{i.gp}}</span><span>{{i.lg}}</span>
+                                {% endfor %}
+                            {% endif %}
+                            <span style="border: 0px !important"></span><span class="right">This Semester Total :</span><span>{{sem8_final.cr_cur}}</span><span>{{sem8_final.gp_cur}}</span><span>{{sem8_final.lg_cur}}</span>
+                            <span style="border: 0px !important"></span><span class="right">Cumulative :</span><span>{{sem8_final.cr_com}}</span><span>{{sem8_final.gp_com}}</span><span>{{sem8_final.lg_com}}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="teacher">
+                        <div style="font-size: .9em;">
+                            <b>Printed on :</b> {{ now }}
+                        </div>
+                        <div>Prepared by</div><div>Compared by</div><div>Deputy Controller of Examination</div>
+                    </div>
+                </div>
+                
+                <!-- semester-8-ex  -->
+                <div class="container">
+                    <div class="heading">
+                        <div class="heading_logo">
+                            <img class="logo" src="{% static 'logo.png' %}">
+                        </div>
+                        <div class="heading_title">
+                            <p style="font-size: 1.20em; font-weight: bold;">SHAHJALAL UNIVERSITY OF SCIENCE & TECHNOLOGY, SYLHET, BANGLADESH.</p>
+                            <p style="font-size:1.15em;">Grade Certificte</p>
+                            <p>B.Sc. in (Engg.) Examination</p>
+                            <p>Session : {{session}}</p>
+                        </div>
+                    </div>
+                    <div class="info">
+                        <span>Institution</span><span>:</span><span>Sylhet Engineering College, Sylhet</span>
+                        <span style="padding-bottom: .5em;">Department</span><span>:</span><span class="f">Computer Science & Engineering</span>
+                        <span>Registration No.</span><span>:</span><span>{{reg}}</span>
+                        <span>Student's Name</span><span>:</span><span>{{name}}</span>
+                    </div>
+                    <div class="title_right">
+                        <div class="title_right_container">
+                            <span >Numeric Grade</span><span>Letter Grade</span><span>Grade Point</span>
+                            <span>80% or above</span><span>A+</span><span>4.00</span>
+                            <span>75% to less than 80%</span><span>A</span><span>3.75</span>
+                            <span>70% to less than 75%</span><span>A-</span><span>3.50</span>
+                            <span>65% to less than 70%</span><span>B+</span><span>3.25</span>
+                            <span>60% to less than 65%</span><span>B</span><span>3.00</span>
+                            <span>55% to less than 60%</span><span>B-</span><span>2.75</span>
+                            <span>50% to less than 55%</span><span>C+</span><span>2.50</span>
+                            <span>45% to less than 50%</span><span>C</span><span>2.25</span>
+                            <span>40% to less than 45%</span><span>C-</span><span>2.00</span>
+                            <span>less than 40%</span><span>F</span><span>0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="semester">
+                        <div style="padding-top: 1.3em; padding-bottom: 1em; font-size: .8em; display: grid; grid-template-columns: 3fr 1fr;">
+                            <div style="margin-left: 1.5em; font-weight: bold;">Fourth Year First Semester Extra {{year}}</div>
+                            <div style="font-weight: bold;">Held on: {{h8_ex}}</div>
+                        </div>
+                        <div class="table">
+                            <span>Course No.</span><span class="left">Course Title</span><span>Credit</span><span style="padding: 0;"><div class="double_row"><span>Grade Obtained</span><span>Grade Point</span><span>Letter Grade</span></div></span>
+                            {% if sem8_ex %}
+                                {% for i in sem8_ex %}
+                                    <span>{{i.code}}</span><span class="left">{{i.title}}</span><span>{{i.cr}}</span><span>{{i.gp}}</span><span>{{i.lg}}</span>
+                                {% endfor %}
+                            {% endif %}
+                            <span style="border: 0px !important"></span><span class="right">This Semester Total :</span><span>{{sem8_ex_final.cr_cur}}</span><span>{{sem8_ex_final.gp_cur}}</span><span>{{sem8_ex_final.lg_cur}}</span>
+                            <span style="border: 0px !important"></span><span class="right">Cumulative :</span><span>{{sem8_ex_final.cr_com}}</span><span>{{sem8_ex_final.gp_com}}</span><span>{{sem8_ex_final.lg_com}}</span>
+                        </div>
+                    </div>
+                    <div class="total_com">
+                        <div class="total_com_container">
+                            <u><h3>Final Result</h3></u>
+                            <div class="total_com_container_table">
+                                <span style="text-align: left; font-size: 1em;">Cumulative</span><span>Credits</span><span>CGPA</span><span>Letter Grade</span>
+                                <span style="text-align: left; font-size: 1em">Final Result</span><span>{{sem8_ex_final.cr_com}}</span><span>{{sem8_ex_final.gp_com}}</span><span>{{sem8_ex_final.lg_com}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="teacher">
+                        <div style="font-size: .9em;">
+                            <b>Printed on :</b> {{ now }}
+                        </div>
+                        <div>Prepared by</div><div>Compared by</div><div>Deputy Controller of Examination</div>
+                    </div>
+                </div>
+
+            {% else %}
+
+                <!-- semester-7-8  -->
+                <div class="container">
+                    <div class="heading">
+                        <div class="heading_logo">
+                            <img class="logo" src="{% static 'logo.png' %}">
+                        </div>
+                        <div class="heading_title">
+                            <p style="font-size: 1.20em; font-weight: bold;">SHAHJALAL UNIVERSITY OF SCIENCE & TECHNOLOGY, SYLHET, BANGLADESH.</p>
+                            <p style="font-size:1.15em;">Grade Certificte</p>
+                            <p>B.Sc. in (Engg.) Examination</p>
+                            <p>Session : {{session}}</p>
+                        </div>
+                    </div>
+                    <div class="info">
+                        <span>Institution</span><span>:</span><span>Sylhet Engineering College, Sylhet</span>
+                        <span style="padding-bottom: .5em;">Department</span><span>:</span><span class="f">Computer Science & Engineering</span>
+                        <span>Registration No.</span><span>:</span><span>{{reg}}</span>
+                        <span>Student's Name</span><span>:</span><span>{{name}}</span>
+                    </div>
+                    <div class="title_right">
+                        <div class="title_right_container">
+                            <span >Numeric Grade</span><span>Letter Grade</span><span>Grade Point</span>
+                            <span>80% or above</span><span>A+</span><span>4.00</span>
+                            <span>75% to less than 80%</span><span>A</span><span>3.75</span>
+                            <span>70% to less than 75%</span><span>A-</span><span>3.50</span>
+                            <span>65% to less than 70%</span><span>B+</span><span>3.25</span>
+                            <span>60% to less than 65%</span><span>B</span><span>3.00</span>
+                            <span>55% to less than 60%</span><span>B-</span><span>2.75</span>
+                            <span>50% to less than 55%</span><span>C+</span><span>2.50</span>
+                            <span>45% to less than 50%</span><span>C</span><span>2.25</span>
+                            <span>40% to less than 45%</span><span>C-</span><span>2.00</span>
+                            <span>less than 40%</span><span>F</span><span>0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="semester">
+                        <div style="padding-top: 1.3em; padding-bottom: 1em; font-size: .8em; display: grid; grid-template-columns: 3fr 1fr;">
+                            <div style="margin-left: 1.5em; font-weight: bold;">Fourth Year First Semester {{year}}</div>
+                            <div style="font-weight: bold;">Held on: {{h7}}</div>
+                        </div>
+                        <div class="table">
+                            <span>Course No.</span><span class="left">Course Title</span><span>Credit</span><span style="padding: 0;"><div class="double_row"><span>Grade Obtained</span><span>Grade Point</span><span>Letter Grade</span></div></span>
+                            {% if sem7 %}
+                                {% for i in sem7 %}
+                                    <span>{{i.code}}</span><span class="left">{{i.title}}</span><span>{{i.cr}}</span><span>{{i.gp}}</span><span>{{i.lg}}</span>
+                                {% endfor %}
+                            {% endif %}
+                            <span style="border: 0px !important"></span><span class="right">This Semester Total :</span><span>{{sem7_final.cr_cur}}</span><span>{{sem7_final.gp_cur}}</span><span>{{sem7_final.lg_cur}}</span>
+                            <span style="border: 0px !important"></span><span class="right">Cumulative :</span><span>{{sem7_final.cr_com}}</span><span>{{sem7_final.gp_com}}</span><span>{{sem7_final.lg_com}}</span>
+                        </div>
+                    </div>
+
+                    <div class="semester">
+                        <div style="padding-top: 1.3em; padding-bottom: 1em; font-size: .8em; display: grid; grid-template-columns: 3fr 1fr;">
+                            <div style="margin-left: 1.5em; font-weight: bold;">Fourth Year Second Semester {{year}}</div>
+                            <div style="font-weight: bold;">Held on: {{h8}}</div>
+                        </div>
+                        <div class="table">
+                            <span>Course No.</span><span class="left">Course Title</span><span>Credit</span><span style="padding: 0;"><div class="double_row"><span>Grade Obtained</span><span>Grade Point</span><span>Letter Grade</span></div></span>
+                            {% if sem8 %}
+                                {% for i in sem8 %}
+                                    <span>{{i.code}}</span><span class="left">{{i.title}}</span><span>{{i.cr}}</span><span>{{i.gp}}</span><span>{{i.lg}}</span>
+                                {% endfor %}
+                            {% endif %}
+                            <span style="border: 0px !important"></span><span class="right">This Semester Total :</span><span>{{sem8_final.cr_cur}}</span><span>{{sem8_final.gp_cur}}</span><span>{{sem8_final.lg_cur}}</span>
+                            <span style="border: 0px !important"></span><span class="right">Cumulative :</span><span>{{sem8_final.cr_com}}</span><span>{{sem8_final.gp_com}}</span><span>{{sem8_final.lg_com}}</span>
+                        </div>
+                    </div>
+                    <div class="total_com">
+                        <div class="total_com_container">
+                            <u><h3>Final Result</h3></u>
+                            <div class="total_com_container_table">
+                                <span style="text-align: left; font-size: 1em;">Cumulative</span><span>Credits</span><span>CGPA</span><span>Letter Grade</span>
+                                <span style="text-align: left; font-size: 1em">Final Result</span><span>{{sem8_final.cr_com}}</span><span>{{sem8_final.gp_com}}</span><span>{{sem8_final.lg_com}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="teacher">
+                        <div style="font-size: .9em;">
+                            <b>Printed on :</b> {{ now }}
+                        </div>
+                        <div>Prepared by</div><div>Compared by</div><div>Deputy Controller of Examination</div>
+                    </div>
+                </div>
+
+            {% endif %}
+        </div>
+        
+    </body>
+</html>

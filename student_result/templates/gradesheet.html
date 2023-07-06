@@ -2,4 +2,14 @@
 
 {% block content %}
     <h3>Gradesheet Page</h3>
+    <div style="width: 35em;">
+        <form method="POST" action="{% url 'gen_gradesheet' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="regi">Student Registration No.</label>
+                <input type="text" name="regi" class="form-control" id="regi" placeholder="Ex. 2018331555">
+            </div>
+            <button type="submit" class="btn btn-success">Search</button>
+        </form>
+    </div>
 {% endblock content %}

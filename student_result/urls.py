@@ -9,12 +9,13 @@ urlpatterns = [
     path('view_session/<slug:year>/', views.view_session, name='view_session'),
     path('add_result/<slug:session>/<int:semester>/', views.add_result, name='add_result'),
     path('student/', views.student, name='student'),
-    path('result/<slug:session>/<int:semester>/', views.result, name='result'),
+    path('result/<slug:result_id>/', views.result, name='result'),
     path('teacher/', views.teacher, name='teacher'),
     path('teacher/<int:result_id>/', views.teacher_result, name='teacher_result'),
     path('delete_result/', views.delete_result, name='delete_result'),
     path('delete_results/', views.delete_results, name='delete_results'),
     path('add_exam/', views.add_exam, name='add_exam'),
     path('gradesheet/', views.gradesheet, name='gradesheet'),
+    path('gen_gradesheet/', views.gen_gradesheet, name='gen_gradesheet'),
     
 ]
